@@ -90,12 +90,7 @@ SELECT @@ServerName [Instance]
 			AND (ic.user_read_nc + iu.user_updates + iu.user_reads) > 0
 			THEN CASE 
 					WHEN ic.Index_Count = 1
-						THEN CASE 
-								WHEN gc.fk_count > 0
-									AND iu.user_scl = 0
-									THEN 'Missing FK Column Index (Opt.)'
-								WHEN iu.user_lookups > ic.user_read_nc
-									THEN 'Missing FK Column Index'
+						THEN CASE  
 								WHEN iu.user_seeks < iu.user_scl
 									THEN 'Missing NCI'
 								WHEN (iu.user_seeks + iu.user_scans) > (iu.user_updates * .5)
@@ -119,9 +114,7 @@ SELECT @@ServerName [Instance]
 								END
 					WHEN ic.Index_Count > 1
 						THEN CASE 
-								WHEN gc.fk_count > 0
-									AND ic.user_read_nc < iu.user_lookups
-									THEN 'Missing FK Column Index'
+								 
 								WHEN iu.user_lookups <= ic.user_seeks_nc_max
 									AND iu.user_seeks < ic.user_seeks_nc_max
 									THEN 'Better CI Available'
@@ -196,7 +189,7 @@ LEFT OUTER JOIN #index_space sp ON sp.object_id = i.object_id
 	AND sp.index_id = i.index_id
 LEFT OUTER JOIN #index_count ic ON o.object_id = ic.object_id
 LEFT OUTER JOIN #gen_count gc ON o.object_id = gc.object_id
-WHERE s.name NOT IN ('sys', 'conversion')
+WHERE s.name NOT IN ('sys')
 	AND EXISTS (
 		SELECT 1
 		FROM sys.indexes c

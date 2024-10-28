@@ -1,5 +1,7 @@
 USE PerformanceLogging
-GO
+
+DECLARE @Schema NVARCHAR(255) = ''
+	,@TableName NVARCHAR(255) = ''
 
 SELECT SchemaName
 	,TableName
@@ -10,34 +12,45 @@ SELECT SchemaName
 GROUP (
 		ORDER BY STATUS
 		) [Status]
-	,SUM(user_updates)  TotalUpdates
-	,SUM(user_seeks)	TotalSeeks
-	,SUM(user_scans)	TotalScans
-	,SUM(user_lookups)	TotalLookups
+	,Count(DatabaseName)
+	,AVG(user_updates) TotalUpdates
+	,AVG(user_seeks) TotalSeeks
+	,AVG(user_scans) TotalScans
+	,AVG(user_lookups) TotalLookups
 FROM (
 	SELECT SchemaName
 		,TableName
 		,IndexName
 		,PK
 		,CI
+		,DatabaseName
 		,STATUS
-		,SUM(user_updates) user_updates
-		,SUM(user_seeks) user_seeks
-		,SUM(user_scans) user_scans
-		,SUM(user_lookups) user_lookups
-	FROM Perf.IndexAdvisory 
+		,AVG(user_updates) user_updates
+		,AVG(user_seeks) user_seeks
+		,AVG(user_scans) user_scans
+		,AVG(user_lookups) user_lookups
+	FROM Perf.IndexAdvisory
 	GROUP BY SchemaName
 		,TableName
+		,DatabaseName
 		,IndexName
 		,PK
 		,CI
 		,STATUS
 	) t
+WHERE (
+		SchemaName = @Schema
+		OR @Schema = ''
+		)
+	AND (
+		TableName = @TableName
+		OR @TableName = ''
+		)
 GROUP BY SchemaName
 	,TableName
 	,IndexName
 	,PK
-	,CI 
+	,CI
 ORDER BY SchemaName
 	,TableName
 	,CASE 

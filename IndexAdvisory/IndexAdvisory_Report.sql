@@ -1,6 +1,9 @@
 USE PerformanceLogging
 GO
 
+DECLARE @Schema NVARCHAR(255) = ''
+	,@TableName NVARCHAR(255) = ''
+
 SELECT Instance
 	,DatabaseName
 	,SchemaName
@@ -27,8 +30,17 @@ SELECT Instance
 	,IndexSpaceUpdatedGB
 	,CollectionDate
 FROM Perf.IndexAdvisory
+WHERE (
+		SchemaName = @Schema
+		OR @Schema = ''
+		)
+	AND (
+		TableName = @TableName
+		OR @TableName = ''
+		)
 ORDER BY SchemaName
 	,TableName
+	,STATUS
 	,CASE 
 		WHEN PK = 1
 			THEN '!'
@@ -36,6 +48,5 @@ ORDER BY SchemaName
 			THEN '@'
 		ELSE IndexName
 		END
-	,STATUS
 	,DatabaseName
 
