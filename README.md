@@ -58,6 +58,7 @@ Dynamic Calculations
      - Reads < (5% of Updates) --> 0:1
    - Else --> 1:0
 ## Thresholds In Roughly Precedence Order
+**Note:** Your mileage may vary. Stay aware of table sizes to avoid spending times fixing scans on a table that is fine being scanned.
 
 **Standalone Clustered Indexes**
 
@@ -71,10 +72,9 @@ Updates + Reads > 0
 
 |Status|Satisfying Conditions| OR | OR|
 |--|--|--|--|
-|Missing NCI|Seeks < Reads_ScL|(Seeks + Scans) > (50% of Updates) && Lookups = 0 && Seeks < (10% of Scans)|Updates > 0 && (Seeks + Lookups) > 0 & Scans > 0|
-|Great|Reads_ScL = 0 && Seeks > 0|(10% of Seeks) > Reads_ScL||
-|Adequate|(50% of Seeks) > Reads_ScL|Else||
-|Revisit Table|Seeks < Lookups|||
+|Missing NCI|Seeks < Scans|(Seeks + Scans) > (50% of Updates) && Seeks < (10% of Scans)|Updates > 0 && Seeks > 0 & Scans > 0|
+|Great|Scans = 0 && Seeks > 0|(10% of Seeks) > Scans ||
+|Adequate|(50% of Seeks) > Scans|Else|| 
 
 
 **Clustered Indexes**
