@@ -12,6 +12,9 @@ SELECT Instance
 	,PrimaryKey
 	,Cluster
 	,UniqueKey
+	,KeyColumns
+	,Includes
+	,Filter
 	,ROW_NUMBER() OVER (
 		PARTITION BY SchemaName
 		,TableName

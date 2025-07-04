@@ -7,6 +7,9 @@ SELECT SchemaName
 	,IndexName
 	,PrimaryKey
 	,Cluster
+	,KeyColumns
+	,Includes
+	,Filter
 	,[Databases]
 	,AvgUpdates
 	,AvgSeeks
@@ -23,6 +26,9 @@ FROM (
 		,PrimaryKey
 		,Cluster
 		,UniqueKey
+		,KeyColumns
+		,Includes
+		,Filter
 		,count(DatabaseName) [Databases]
 		,STRING_AGG(STATUS,',') [Status]
 		,AVG(Updates) AvgUpdates
@@ -51,7 +57,10 @@ FROM (
 		,IndexName
 		,PrimaryKey
 		,Cluster
-		,UniqueKey 
+		,UniqueKey		
+		,KeyColumns
+		,Includes
+		,Filter
 	) t
 ORDER BY SchemaName
 	,TableName
