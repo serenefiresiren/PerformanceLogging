@@ -9,8 +9,9 @@ SELECT Instance
 	,SchemaName
 	,TableName
 	,IndexName
-	,PK
-	,CI
+	,PrimaryKey
+	,Cluster
+	,UniqueKey
 	,ROW_NUMBER() OVER (
 		PARTITION BY SchemaName
 		,TableName
@@ -22,14 +23,14 @@ SELECT Instance
 		) [DBRowNum]
 	,STATUS
 	,ReadWriteRatio
-	,user_updates
-	,user_seeks
-	,user_scans
-	,user_lookups
+	,Updates
+	,Seeks
+	,Scans
+	,Lookups
 	,IndexSizeMB
 	,IndexSpaceUpdatedGB
 	,CollectionDate
-FROM Perf.IndexAdvisory
+FROM Perf.IndexSummary
 WHERE (
 		SchemaName = @Schema
 		OR @Schema = ''
@@ -42,9 +43,9 @@ ORDER BY SchemaName
 	,TableName
 	,STATUS
 	,CASE 
-		WHEN PK = 1
+		WHEN PrimaryKey = 1
 			THEN '!'
-		WHEN CI = 1
+		WHEN Cluster = 1
 			THEN '@'
 		ELSE IndexName
 		END

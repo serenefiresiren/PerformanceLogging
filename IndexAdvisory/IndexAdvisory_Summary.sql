@@ -1,63 +1,66 @@
-USE PerformanceLogging
-
-DECLARE @Schema NVARCHAR(255) = ''
-	,@TableName NVARCHAR(255) = ''
+DECLARE @SchemaName NVARCHAR(255)  = ''
+	,@TableName NVARCHAR(255)  = ''
+	,@CollectionDate DATETIME = '7/4/25'
 
 SELECT SchemaName
 	,TableName
 	,IndexName
-	,PK
-	,CI
-	,STRING_AGG(STATUS, ', ') WITHIN
-GROUP (
-		ORDER BY STATUS
-		) [Status]
-	,Count(DatabaseName)
-	,AVG(user_updates) TotalUpdates
-	,AVG(user_seeks) TotalSeeks
-	,AVG(user_scans) TotalScans
-	,AVG(user_lookups) TotalLookups
+	,PrimaryKey
+	,Cluster
+	,[Databases]
+	,AvgUpdates
+	,AvgSeeks
+	,AvgScans
+	,AvgLookups
+	,TotalUpdates
+	,TotalSeeks
+	,TotalScans
+	,TotalLookups
 FROM (
-	SELECT SchemaName
+	SELECT DISTINCT SchemaName
 		,TableName
 		,IndexName
-		,PK
-		,CI
-		,DatabaseName
-		,STATUS
-		,AVG(user_updates) user_updates
-		,AVG(user_seeks) user_seeks
-		,AVG(user_scans) user_scans
-		,AVG(user_lookups) user_lookups
-	FROM Perf.IndexAdvisory
+		,PrimaryKey
+		,Cluster
+		,UniqueKey
+		,count(DatabaseName) [Databases]
+		,STRING_AGG(STATUS,',') [Status]
+		,AVG(Updates) AvgUpdates
+		,AVG(Seeks) AvgSeeks
+		,AVG(Scans) AvgScans
+		,AVG(Lookups) AvgLookups
+		,SUM(Updates) TotalUpdates
+		,SUM(Seeks) TotalSeeks
+		,SUM(Scans) TotalScans
+		,SUM(Lookups) TotalLookups
+	FROM Perf.IndexSummary
+	WHERE (
+			@CollectionDate = ''
+			OR CollectionDate = @CollectionDate
+			)
+		AND (
+			@SchemaNAme = ''
+			OR SchemaName = @SchemaName
+			)
+		AND (
+			@TableNAme = ''
+			OR TableNAme = @TableName
+			)
 	GROUP BY SchemaName
 		,TableName
-		,DatabaseName
 		,IndexName
-		,PK
-		,CI
-		,STATUS
+		,PrimaryKey
+		,Cluster
+		,UniqueKey 
 	) t
-WHERE (
-		SchemaName = @Schema
-		OR @Schema = ''
-		)
-	AND (
-		TableName = @TableName
-		OR @TableName = ''
-		)
-GROUP BY SchemaName
-	,TableName
-	,IndexName
-	,PK
-	,CI
 ORDER BY SchemaName
 	,TableName
 	,CASE 
-		WHEN PK = 1
+		WHEN PrimaryKey = 1
 			THEN '!'
-		WHEN CI = 1
+		WHEN Cluster = 1
 			THEN '@'
 		ELSE IndexName
 		END
+ 
 

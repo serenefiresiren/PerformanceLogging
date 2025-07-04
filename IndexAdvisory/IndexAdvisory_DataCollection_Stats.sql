@@ -1,5 +1,4 @@
-IF (Object_ID('tempdb..#index_space')) IS NOT NULL
-	DROP TABLE #index_space
+DROP TABLE IF EXISTS #index_space
 
 SELECT object_id
 	,index_id
@@ -67,13 +66,13 @@ SELECT @@ServerName [Instance]
 	,s.name AS SchemaName
 	,o.name AS TableName
 	,i.name AS IndexName
-	,i.IS_PRimary_Key [PK]
+	,i.IS_PRimary_Key [PrimaryKey]
 	,CASE i.Type
 		WHEN 1
 			THEN 1
 		ELSE 0
-		END [CI]
-	,i.is_unique [UC]
+		END [Cluster]
+	,i.is_unique [UniqueKey]
 	,CASE 
 		WHEN gc.Column_Count = 1
 			AND ic.Index_count = 1
@@ -173,10 +172,10 @@ SELECT @@ServerName [Instance]
 					END
 		ELSE '1 : 0'
 		END ReadWriteRatio
-	,iu.user_updates
-	,iu.user_seeks
-	,iu.user_scans
-	,iu.user_lookups
+	,iu.user_updates [Updates]
+	,iu.user_seeks [Seeks]
+	,iu.user_scans [Scans]
+	,iu.user_lookups [Lookups]
 	,sp.IndexSizeMB
 	,(sp.IndexSizeMB * iu.user_updates) / 1024.0 AS IndexSpaceUpdatedGB
 	,GetDate() [CollectionDate]
@@ -198,6 +197,6 @@ WHERE s.name NOT IN ('sys')
 		)
 ORDER BY SchemaName
 	,TableName
-	,CI DESC
+	,Cluster DESC
 	,IndexName
 
