@@ -1,16 +1,10 @@
 # Table Index Advisory
 
-Reports on index efficiency, identifies gaps, and highlights ones that are just bloat. It is advisable to run it across a few clients of varying sizes before making a move on a particular index or table. Ignores tables in the `sys` and `conversion` schemas, heaps, and tables with no index over 5MB. Statuses are more what you'd call 'intelligent guidelines' than actual rules. 
+Reports on index definitions with efficiency and gap analysis. It is advisable to run it across a few clients of varying sizes before making a move on a particular index or table. Ignores tables in the `sys` and `conversion` schemas, heaps, and tables with no index over 5MB. Statuses are more what you'd call 'intelligent guidelines' than actual rules. 
 
 Requires [dbatools](https://dbatools.io/).
 
-
-## Data Definition
-Self-explanatory: Instance, DatabaseName, SchemaName, TableName, IndexName, IndexSizeMB, ReadWriteRatio
-- <u>LegacyCE:</u> Indicates if Legacy Cardinality Estimator is on or off.
-- <u>PK:</u> Index is the Primary Key. Note: Each table only has one.
-- <u>CI:</u> Clustered Index. Note: Each table only has one, typically on the PK.
-- <u>UC:</u> Unique Index. Note: Each table can have more than one. 
+## Definitions
 - <u>Status:</u> Based upon thresholds in the next step.
    - <u>No Status (-):</u> No tuning required or a single index table is too small to consider.
    - <u>Adequate:</u> Serves a purpose but could be better.
@@ -23,9 +17,8 @@ Self-explanatory: Instance, DatabaseName, SchemaName, TableName, IndexName, Inde
    - <u>Review All Indexes:</u> One or more things is functionally wrong given the metrics of both the clustered and non-clustered indexes.
    - <u>Review NCIs:</u> All non-clustered indexes need to be review due to the usage of the clustered.
    - <u>Review Table:</u> Indicates the clustered is likely correct, but the number of scans and lookups indicates one or more indexes are not comprehensive or structured well enough. No one problem could be identified.  
-
-
-- <u>IndexSpaceUpdatedGB:</u> Total Updates * IndexSizeMB in GBs. Possibly start by largest amount of data being manipulated in a table to determine order of operation. 
+   - <u>IndexSpaceUpdatedGB:</u> Total Updates * IndexSizeMB in GBs. Possibly start by largest amount of data being manipulated in a table to determine order of operation. 
+- <u>Reviewed:</u> Optional indicator to mark manual analysis progress. Defaults to 0.
 
 ## Key Data Points
 
